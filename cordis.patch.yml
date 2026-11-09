@@ -1,0 +1,16 @@
+# Host stock stays disabled so this engine can register ctx.compaction.
+# Presets are not injected, so a missing gate cannot leave them waiting.
+- id: compaction-basic
+  disabled: true
+- insert:
+    - id: compaction-spine
+      name: dsh-live-compact-local
+      config:
+        auto: true
+        # These three values are also copied onto the web preset engine by gate.js.
+        thresholdRatio: 0.8
+        headroomTokens: 65536
+        retainTokens: 8192
+        compactionRetries: 0
+    - id: live-compact-gate
+      name: dsh-live-compact-local/gate

@@ -1,0 +1,40 @@
+{
+  "name": "dsh-live-compact-local",
+  "version": "1.1.1-local.3",
+  "description": "Localized fork of dsh-live-compact 1.1.1 (MIT). In-place newest-turn compaction for DeepSeek Harness. The rotateShadow usage-estimate fix is baked directly into the source, so no pnpm patch is needed.",
+  "license": "MIT",
+  "author": "Local fork by 大肥鱼; original by MerkyorLynn <268568828+MerkyorLynn@users.noreply.github.com>",
+  "type": "module",
+  "main": "src/prebuilt/shell.js",
+  "exports": {
+    ".": "./src/prebuilt/shell.js",
+    "./engine": "./src/prebuilt/index.js",
+    "./gate": "./src/prebuilt/gate.js",
+    "./shadow-search": "./src/prebuilt/shadow-search.js"
+  },
+  "files": [
+    "src",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "compaction"
+  ],
+  "engines": {
+    "node": "^22.19 || >=24",
+    "dsh": ">=0.2.0-rc.2 <0.3.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-compaction": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-compaction-basic": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-llm": ">=0.2.0-rc.2 <0.3.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}
