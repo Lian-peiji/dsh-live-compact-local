@@ -136,7 +136,8 @@ export function captureToolResult({
     const bytes = Buffer.from(body, "utf8");
     const hash = contentHash(bytes);
 
-    // 记账由 writeShadowFile（唯一写口）完成，这里不再单独上报。
+    // 【本地补丁 L3-1】记账由 writeShadowFile（唯一写口）完成，这里不再单独上报。
+    // （原版这里调 bumpShadowEstimate(bytes.length) 和 (200)，后者把 meta 按固定 200 字节粗估。）
     writeShadowFile(file, bytes, access, { exclusive: true });
     createdRaw = true;
 

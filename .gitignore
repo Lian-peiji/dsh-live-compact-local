@@ -2,3 +2,4 @@ node_modules/
 backups/
 *.log
 .DS_Store
+issue-comment.md

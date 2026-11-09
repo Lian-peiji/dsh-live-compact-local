@@ -394,7 +394,7 @@ export function discardShadowFiles(files, cause, { account = true } = {}) {
     try {
       unlinkSync(file);
       // 只有「已入账的文件」才扣。writeShadowFile 内部回滚时还没记账，扣了就是反向错账。
-      if (account) noteShadowUnlink(file);
+      if (account) noteShadowUnlink(file); // 【本地补丁 L3-1】回滚也要扣账
     } catch (error) {
       if (error?.code !== "ENOENT") errors.push(error);
     }
@@ -454,7 +454,7 @@ export function writeShadowFile(
     const opened = fd;
     fd = null;
     closeSync(opened);
-    noteShadowWrite(file, priorBytes); // 记账集中在这里：唯一写口
+    noteShadowWrite(file, priorBytes); // 【本地补丁 L3-1】记账集中在这里：唯一写口
     return file;
   } catch (error) {
     if (fd !== null) {
@@ -519,6 +519,7 @@ export function listPluginShadows(dir) {
         mtimeMs: info.mtimeMs,
         // raw- 由 raw.js 直接写 body，从不带 "# spine-session" 头，
         // 归属由所在目录决定。跳过读头能省掉整棵树的逐文件打开（本机 459ms / 6728 文件）。
+        // 【本地补丁 L3-4】raw- 无会话头，跳过 open/read（省 459ms）
         sessionKey: name.startsWith("raw-") ? "" : readSessionKey(path),
       });
     } catch {}
@@ -615,6 +616,7 @@ function shadowUsageKeyFor(dir) {
  * 纯点数：只 readdir，不 stat、不打开文件。14ms 级。
  * 与 listShadowEntries 判定「哪些文件计入用量」的口径完全一致，用来校验账目。
  */
+// 【本地补丁 L3-2】点数校验：只 readdir、不 stat、不开文件（14ms 级）
 function countShadowFiles(root) {
   let files = 0;
   let names;
@@ -641,6 +643,7 @@ function countShadowFiles(root) {
 }
 
 /** 全量精确校准：进程首次、换目录、或点数对不上时跑一次（~450ms，属慢路径）。 */
+// 【本地补丁 L3-3】全量精确校准：只在首次/换目录/点数不符/真要删时才跑
 function calibrateShadow(dir, alive = processAlive) {
   const files = listShadowEntries(dir, alive);
   let bytes = 0;
